@@ -37,4 +37,16 @@ jobs:
           go build
           ls -l
           id
+
+      - name: Setup ssh agent
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add /home/runner/.ssh/id_rsa
+          ssh-add -l
         
+      - name: build image
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: docker build . --platform linux/amd64 --ssh default -t test-build -f Dockerfile
